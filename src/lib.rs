@@ -147,7 +147,7 @@
 //! /// `futures` version of `Timer.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait() -> impl Future<(), !> {
+//! fn wait() -> impl Future<Item = (), Error = !> {
 //!     future::poll_fn(|| {
 //!         Ok(Async::Ready(try_nb!(Timer.wait())))
 //!     })
@@ -156,7 +156,7 @@
 //! /// `futures` version of `Serial.read`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn read() -> impl Future<u8, Error> {
+//! fn read() -> impl Future<Item = u8, Error = Error> {
 //!     future::poll_fn(|| {
 //!         Ok(Async::Ready(try_nb!(Serial.read())))
 //!     })
@@ -165,7 +165,7 @@
 //! /// `futures` version of `Serial.write`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn write(byte: u8) -> impl Future<(), Error> {
+//! fn write(byte: u8) -> impl Future<Item = (), Error = Error> {
 //!     future::poll_fn(|| {
 //!         Ok(Async::Ready(try_nb!(Serial.write(byte))))
 //!     })
@@ -175,9 +175,9 @@
 //! let mut blinky = future::loop_fn(true, |_| {
 //!     wait().map(|_| {
 //!         if state {
-//!             Green.on();
+//!             Led.on();
 //!         } else {
-//!             Green.off();
+//!             Led.off();
 //!         }
 //!
 //!         Loop::Continue(!state)
