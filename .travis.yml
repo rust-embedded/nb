@@ -8,7 +8,7 @@ matrix:
 before_install: set -e
 
 install:
-  - sh ci/install.sh
+  - bash ci/install.sh
 
 script:
   - bash ci/script.sh
@@ -16,7 +16,7 @@ script:
 after_script: set +e
 
 after_success:
-  - sh ci/after_success.sh
+  - bash ci/after_success.sh
 
 cache: cargo
 before_cache:
