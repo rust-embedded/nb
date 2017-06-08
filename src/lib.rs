@@ -55,7 +55,7 @@
 //!
 //! Once your API uses the `nb::Error` enum you can leverage the [`block!`],
 //! [`try_nb!`] and [`await!`] macros to adapt it for blocking operation, or for
-//! non-blocking, `futures` or `await`, operation.
+//! non-blocking operation with `futures` or `await`.
 //!
 //! [`block!`]: macro.block.html
 //! [`try_nb!`]: macro.try_nb.html
@@ -65,11 +65,12 @@
 //!
 //! ## Core I/O API
 //!
-//! A Hardware Abstraction Layer for some microcontroller (family).
+//! A Hardware Abstraction Layer for some microcontroller (or microcontroller
+//! family).
 //!
 //! In this and the following examples let's assume for simplicity that
 //! peripherals are represented by global singletons and that no preemption is
-//! possible (i.e. no interrupts)
+//! possible (i.e. no interrupts).
 //!
 //! ``` ignore
 //! // This is the `hal` crate
@@ -77,6 +78,7 @@
 //!
 //! extern crate nb;
 //!
+//! /// An LED
 //! pub struct Led;
 //!
 //! impl Led {
@@ -96,7 +98,7 @@
 //!     pub fn write(&self, byte: u8) -> nb::Result<(), Error> { .. }
 //! }
 //!
-//! /// A timer used for periodic timeouts
+//! /// A timer used for timeouts
 //! pub struct Timer;
 //!
 //! impl Timer {
@@ -213,6 +215,7 @@
 //!
 //! use hal::{Led, Serial, Timer};
 //!
+//! // Tasks
 //! let mut blinky = (|| {
 //!     let mut state = false;
 //!     loop {
