@@ -8,41 +8,37 @@
 //!
 //! # Core idea
 //!
-//! A `WouldBlock` error variant. This error signals that the operation can't be
-//! completed *right now* and would need to block to complete. `WouldBlock` is a
-//! special error in the sense that's not *fatal*; the operation can still be
-//! completed by retrying again later.
+//! The [`WouldBlock`](enum.Error.html) error variant signals that the operation can't be completed
+//! *right now* and would need to block to complete. [`WouldBlock`](enum.Error.html) is a special
+//! error in the sense that's not *fatal*; the operation can still be completed by retrying again
+//! later.
+//! 
+//! [`nb::Result`](type.Result.html) is based on the API of
+//! [`std::io::Result`](https://doc.rust-lang.org/std/io/type.Result.html), which has a
+//! `WouldBlock` variant in its
+//! [`ErrorKind`](https://doc.rust-lang.org/std/io/enum.ErrorKind.html). 
 //!
-//! We can map `WouldBlock` to different non-blocking and blocking models:
-//!
-//! - In blocking mode: `WouldBlock` means try again right now (i.e. busy wait)
-//! - In `futures` mode: `WouldBlock` means `Async::NotReady`
-//! - In `await` mode: `WouldBlock` means `yield` (suspend the generator)
+//! We can map [`WouldBlock`](enum.Error.html) to different blocking and non-blocking models:
+//! - In blocking mode: [`WouldBlock`](enum.Error.html) means try again right now (i.e. busy wait)
+//! - In `futures` mode: [`WouldBlock`](enum.Error.html) means
+//!   [`Async::NotReady`](https://docs.rs/futures)
+//! - In `await` mode: [`WouldBlock`](enum.Error.html) means `yield` (suspend the generator)
 //!
 //! # How to use this crate
+//! Application specific errors can be put inside the `Other` variant in the
+//! [`nb::Error`](enum.Error.html) enum.
 //!
-//! Other error enums can be extended with the `WouldBlock` variant using the
-//! `Error` enum defined in this crate:
-//!
-//! ``` ignore
-//! enum Error<E> {
-//!     Other(E),
-//!     WouldBlock,
-//! }
-//! ```
-//!
-//! So in your API instead of returning `MyError` return `nb::Error<MyError>`:
-//!
+//! So in your API instead of returning `Result<T, MyError>` return
+//! `nb::Result<T, MyError>` 
+//! 
 //! ``` ignore
 //! enum MyError { ThisError, ThatError, .. }
 //!
-//! // This can return `Ok(())`, `Err(MyError::ThisError)`,
-//! // `Err(MyError::ThatError)`, ...
+//! // This is NOT a blocking function, so it returns a normal `Result`
 //! fn before() -> Result<(), MyError> { .. }
 //!
-//! // Now this can return `Ok(())`, `Err(nb::Error::WouldBlock)`,
-//! // `Err(nb::Error::Other(MyError::ThisError))`, ...
-//! fn after() -> Result<(), nb::Error<MyError>> { .. }
+//! // This is a potentially blocking function so it returns `nb::Result`
+//! fn after() -> nb::Result<(), MyError> { .. }
 //! ```
 //!
 //! You can use the *never type* (`!`) to signal that some API has no fatal
@@ -50,10 +46,10 @@
 //!
 //! ``` ignore
 //! // This returns `Ok(())` or `Err(nb::Error::WouldBlock)`
-//! fn maybe_blocking_api() -> Result<(), nb::Error<!>> { .. }
+//! fn maybe_blocking_api() -> nb::Result<(), !> { .. }
 //! ```
 //!
-//! Once your API uses the `nb::Error` enum you can leverage the [`block!`],
+//! Once your API uses [`nb::Result`](type.Result.html) you can leverage the [`block!`],
 //! [`try_nb!`] and [`await!`] macros to adapt it for blocking operation, or for
 //! non-blocking operation with `futures` or `await`.
 //!
