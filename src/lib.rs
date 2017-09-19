@@ -259,6 +259,7 @@ pub type Result<T, E> = ::core::result::Result<T, Error<E>>;
 ///
 /// The main use of this enum is to add a `WouldBlock` variant to an existing
 /// error enum.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Error<E> {
     /// A different kind of error
     Other(E),
