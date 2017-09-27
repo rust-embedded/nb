@@ -302,8 +302,12 @@ where
 macro_rules! await {
     ($e:expr) => {
         loop {
+            #[allow(unreachable_patterns)]
             match $e {
-                Err($crate::Error::Other(e)) => break Err(e),
+                Err($crate::Error::Other(e)) => {
+                    #[allow(unreachable_code)]
+                    break Err(e)
+                },
                 Err($crate::Error::WouldBlock) => yield (),
                 Ok(x) => break Ok(x),
             }
