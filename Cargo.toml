@@ -8,4 +8,8 @@ name = "nb"
 repository = "https://github.com/japaric/nb"
 version = "0.1.0"
 
-[dependencies]
+[features]
+unstable = []
+
+[dev-dependencies]
+futures = "0.1.17"

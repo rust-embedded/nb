@@ -36,27 +36,46 @@
 //! So in your API instead of returning `Result<T, MyError>` return
 //! `nb::Result<T, MyError>`
 //!
-//! ``` ignore
-//! enum MyError { ThisError, ThatError, .. }
+//! ```
+//! enum MyError {
+//!     ThisError,
+//!     ThatError,
+//!     // ..
+//! }
 //!
-//! // This is NOT a blocking function, so it returns a normal `Result`
-//! fn before() -> Result<(), MyError> { .. }
+//! // This is a blocking function, so it returns a normal `Result`
+//! fn before() -> Result<(), MyError> {
+//!     // ..
+//! #   Ok(())
+//! }
 //!
-//! // This is a potentially blocking function so it returns `nb::Result`
-//! fn after() -> nb::Result<(), MyError> { .. }
+//! // This is now a potentially (read: *non*) blocking function so it returns `nb::Result`
+//! // instead of blocking
+//! fn after() -> nb::Result<(), MyError> {
+//!     // ..
+//! #   Ok(())
+//! }
 //! ```
 //!
 //! You can use the *never type* (`!`) to signal that some API has no fatal
 //! errors but may block:
 //!
-//! ``` ignore
+//! ```
+//! #![feature(never_type)]
+//!
 //! // This returns `Ok(())` or `Err(nb::Error::WouldBlock)`
-//! fn maybe_blocking_api() -> nb::Result<(), !> { .. }
+//! fn maybe_blocking_api() -> nb::Result<(), !> {
+//!     // ..
+//! #   Ok(())
+//! }
 //! ```
 //!
 //! Once your API uses [`nb::Result`](type.Result.html) you can leverage the
 //! [`block!`], [`try_nb!`] and [`await!`] macros to adapt it for blocking
 //! operation, or for non-blocking operation with `futures` or `await`.
+//!
+//! **NOTE** Currently, both `try_nb!` and `await!` are feature gated behind the `unstable` Cargo
+//! feature.
 //!
 //! [`block!`]: macro.block.html
 //! [`try_nb!`]: macro.try_nb.html
@@ -73,7 +92,9 @@
 //! peripherals are represented by global singletons and that no preemption is
 //! possible (i.e. no interrupts).
 //!
-//! ``` ignore
+//! ```
+//! #![feature(never_type)]
+//!
 //! // This is the `hal` crate
 //! // Note that it doesn't depend on the `futures` crate
 //!
@@ -83,20 +104,33 @@
 //! pub struct Led;
 //!
 //! impl Led {
-//!     pub fn off(&self) { .. }
-//!     pub fn on(&self) { .. }
+//!     pub fn off(&self) {
+//!         // ..
+//!     }
+//!     pub fn on(&self) {
+//!         // ..
+//!     }
 //! }
 //!
 //! /// Serial interface
 //! pub struct Serial;
-//! pub enum Error { Overrun, .. }
+//! pub enum Error {
+//!     Overrun,
+//!     // ..
+//! }
 //!
 //! impl Serial {
 //!     /// Reads a single byte from the serial interface
-//!     pub fn read(&self) -> nb::Result<u8, Error> { .. }
+//!     pub fn read(&self) -> nb::Result<u8, Error> {
+//!         // ..
+//! #       Ok(0)
+//!     }
 //!
 //!     /// Writes a single byte to the serial interface
-//!     pub fn write(&self, byte: u8) -> nb::Result<(), Error> { .. }
+//!     pub fn write(&self, byte: u8) -> nb::Result<(), Error> {
+//!         // ..
+//! #       Ok(())
+//!     }
 //! }
 //!
 //! /// A timer used for timeouts
@@ -104,9 +138,13 @@
 //!
 //! impl Timer {
 //!     /// Waits until the timer times out
-//!     pub fn wait(&self) -> nb::Result<(), !> { .. }
-//!     //^ NOTE the `!` indicates that this operation can block but has no
-//!     //  other form of error
+//!     pub fn wait(&self) -> nb::Result<(), !> {
+//!         //^ NOTE the `!` indicates that this operation can block but has no
+//!         //  other form of error
+//!
+//!         // ..
+//! #       Ok(())
+//!     }
 //! }
 //! ```
 //!
@@ -114,23 +152,44 @@
 //!
 //! Turn on an LED for one second and *then* loops back serial data.
 //!
-//! ``` ignore
-//! extern crate hal;
-//! #[macro_use]
+//! ```
+//! # #![feature(never_type)]
+//! #[macro_use(block)]
 //! extern crate nb;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
-//! // Turn the LED on for one second
-//! Led.on();
-//! block!(Timer.wait()).unwrap(); // NOTE(unwrap) E = !
-//! Led.off();
+//! fn main() {
+//!     // Turn the LED on for one second
+//!     Led.on();
+//!     block!(Timer.wait()).unwrap(); // NOTE(unwrap) E = !
+//!     Led.off();
 //!
-//! // Serial interface loopback
-//! loop {
-//!     let byte = block!(Serial.read());
-//!     block!(Serial.write(byte));
+//!     // Serial interface loopback
+//!     # return;
+//!     loop {
+//!         let byte = block!(Serial.read()).unwrap();
+//!         block!(Serial.write(byte)).unwrap();
+//!     }
 //! }
+//!
+//! # mod hal {
+//! #   use nb;
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&self) {}
+//! #       pub fn on(&self) {}
+//! #   }
+//! #   pub struct Serial;
+//! #   impl Serial {
+//! #       pub fn read(&self) -> nb::Result<u8, ()> { Ok(0) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), ()> { Ok(()) }
+//! #   }
+//! #   pub struct Timer;
+//! #   impl Timer {
+//! #       pub fn wait(&self) -> nb::Result<(), !> { Ok(()) }
+//! #   }
+//! # }
 //! ```
 //!
 //! ## `futures`
@@ -138,14 +197,17 @@
 //! Blinks an LED every second *and* loops back serial data. Both tasks run
 //! concurrently.
 //!
-//! ``` ignore
+//! ```
+//! #![feature(conservative_impl_trait)]
+//! #![feature(never_type)]
+//!
 //! extern crate futures;
-//! extern crate hal;
-//! #[macro_use]
+//! #[macro_use(try_nb)]
 //! extern crate nb;
 //!
-//! use futures::{Async, Future, future};
-//! use hal::{Led, Serial, Timer};
+//! use futures::{Async, Future};
+//! use futures::future::{self, Loop};
+//! use hal::{Error, Led, Serial, Timer};
 //!
 //! /// `futures` version of `Timer.wait`
 //! ///
@@ -169,82 +231,128 @@
 //! ///
 //! /// This returns a future that must be polled to completion
 //! fn write(byte: u8) -> impl Future<Item = (), Error = Error> {
-//!     future::poll_fn(|| {
+//!     future::poll_fn(move || {
 //!         Ok(Async::Ready(try_nb!(Serial.write(byte))))
 //!     })
 //! }
 //!
-//! // Tasks
-//! let mut blinky = future::loop_fn(true, |_| {
-//!     wait().map(|_| {
-//!         if state {
-//!             Led.on();
-//!         } else {
-//!             Led.off();
-//!         }
+//! fn main() {
+//!     // Tasks
+//!     let mut blinky = future::loop_fn::<_, (), _, _>(true, |state| {
+//!         wait().map(move |_| {
+//!             if state {
+//!                 Led.on();
+//!             } else {
+//!                 Led.off();
+//!             }
 //!
-//!         Loop::Continue(!state)
+//!             Loop::Continue(!state)
+//!         })
 //!     });
-//! });
 //!
-//! let mut loopback = future::loop_fn((), |_| {
-//!     read().and_then(|byte| {
-//!         write(byte)
-//!     }).map(|_| {
-//!         Loop::Continue(())
+//!     let mut loopback = future::loop_fn::<_, (), _, _>((), |_| {
+//!         read().and_then(|byte| {
+//!             write(byte)
+//!         }).map(|_| {
+//!             Loop::Continue(())
+//!         })
 //!     });
-//! });
 //!
-//! // Event loop
-//! loop {
-//!     blinky().poll().unwrap(); // NOTE(unwrap) E = !
-//!     loopback().poll().unwrap();
+//!     // Event loop
+//!     loop {
+//!         blinky.poll().unwrap(); // NOTE(unwrap) E = !
+//!         loopback.poll().unwrap();
+//!         # break
+//!     }
 //! }
+//!
+//! # mod hal {
+//! #   use nb;
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&self) {panic!()}
+//! #       pub fn on(&self) {}
+//! #   }
+//! #   #[derive(Debug)]
+//! #   pub enum Error {}
+//! #   pub struct Serial;
+//! #   impl Serial {
+//! #       pub fn read(&self) -> nb::Result<u8, Error> { Err(nb::Error::WouldBlock) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), Error> { Err(nb::Error::WouldBlock) }
+//! #   }
+//! #   pub struct Timer;
+//! #   impl Timer {
+//! #       pub fn wait(&self) -> nb::Result<(), !> { Err(nb::Error::WouldBlock) }
+//! #   }
+//! # }
 //! ```
 //!
 //! ## `await!`
 //!
-//! **NOTE** The `await!` macro requires language support for generators, which
-//! is not yet in the compiler.
-//!
 //! This is equivalent to the `futures` example but with much less boilerplate.
 //!
-//! ``` ignore
-//! extern crate hal;
-//! #[macro_use]
+//! ```
+//! #![feature(generator_trait)]
+//! #![feature(generators)]
+//! #![feature(never_type)]
+//!
+//! #[macro_use(await)]
 //! extern crate nb;
+//!
+//! use std::ops::Generator;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
-//! // Tasks
-//! let mut blinky = (|| {
-//!     let mut state = false;
-//!     loop {
-//!         // `await!` means suspend / yield instead of blocking
-//!         await!(Timer.wait()).unwrap(); // NOTE(unwrap) E = !
+//! fn main() {
+//!     // Tasks
+//!     let mut blinky = || {
+//!         let mut state = false;
+//!         loop {
+//!             // `await!` means suspend / yield instead of blocking
+//!             await!(Timer.wait()).unwrap(); // NOTE(unwrap) E = !
 //!
-//!         state = !state;
+//!             state = !state;
 //!
-//!         if state {
-//!              Led.on();
-//!         } else {
-//!              Led.off();
+//!             if state {
+//!                  Led.on();
+//!             } else {
+//!                  Led.off();
+//!             }
 //!         }
-//!     }
-//! })();
+//!     };
 //!
-//! let mut loopback = (|| {
+//!     let mut loopback = || {
+//!         loop {
+//!             let byte = await!(Serial.read()).unwrap();
+//!             await!(Serial.write(byte)).unwrap();
+//!         }
+//!     };
+//!
+//!     // Event loop
 //!     loop {
-//!         let byte = await!(serial.read()).unwrap();
-//!         await!(serial.write(byte)).unwrap();
+//!         blinky.resume();
+//!         loopback.resume();
+//!         # break
 //!     }
-//! })();
-//!
-//! // Event loop
-//! loop {
-//!     blinky.resume();
-//!     serial.resume();
 //! }
+//!
+//! # mod hal {
+//! #   use nb;
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&self) {}
+//! #       pub fn on(&self) {}
+//! #   }
+//! #   pub struct Serial;
+//! #   impl Serial {
+//! #       pub fn read(&self) -> nb::Result<u8, ()> { Err(nb::Error::WouldBlock) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), ()> { Err(nb::Error::WouldBlock) }
+//! #   }
+//! #   pub struct Timer;
+//! #   impl Timer {
+//! #       pub fn wait(&self) -> nb::Result<(), !> { Err(nb::Error::WouldBlock) }
+//! #   }
+//! # }
 //! ```
 
 #![no_std]
@@ -298,6 +406,7 @@ where
 ///
 /// - `Ok(t)` if `$e` evaluates to `Ok(t)`
 /// - `Err(e)` if `$e` evaluates to `Err(nb::Error::Other(e))`
+#[cfg(feature = "unstable")]
 #[macro_export]
 macro_rules! await {
     ($e:expr) => {
@@ -370,6 +479,7 @@ macro_rules! block {
 /// # Output
 ///
 /// `t` if `$e` evaluates to `Ok(t)`
+#[cfg(feature = "unstable")]
 #[macro_export]
 macro_rules! try_nb {
     ($e:expr) => {
