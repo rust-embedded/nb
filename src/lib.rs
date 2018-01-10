@@ -416,9 +416,11 @@ macro_rules! await {
                     #[allow(unreachable_code)]
                     break Err(e)
                 },
-                Err($crate::Error::WouldBlock) => yield (),
+                Err($crate::Error::WouldBlock) => {}, // yield (see below)
                 Ok(x) => break Ok(x),
             }
+
+            yield
         }
     }
 }
