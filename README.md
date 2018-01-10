@@ -2,7 +2,7 @@
 
 > Minimal and reusable non-blocking I/O layer
 
-## [Documentation](https://japaric.github.io/nb/nb)
+## [Documentation](https://docs.rs/nb)
 
 ## License
 
