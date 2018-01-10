@@ -83,14 +83,13 @@
 //!
 //! # Examples
 //!
-//! ## Core I/O API
+//! ## A Core I/O API
 //!
-//! A Hardware Abstraction Layer for some microcontroller (or microcontroller
-//! family).
+//! Imagine the code (crate) below represents a Hardware Abstraction Layer for some microcontroller
+//! (or microcontroller family).
 //!
-//! In this and the following examples let's assume for simplicity that
-//! peripherals are represented by global singletons and that no preemption is
-//! possible (i.e. no interrupts).
+//! *In this and the following examples let's assume for simplicity that peripherals are treated
+//! as global singletons and that no preemption is possible (i.e. interrupts are disabled).*
 //!
 //! ```
 //! #![feature(never_type)]
