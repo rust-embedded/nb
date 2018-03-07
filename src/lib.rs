@@ -357,6 +357,11 @@
 #![no_std]
 #![deny(warnings)]
 
+#![cfg_attr(feature = "unstable", feature(never_type))]
+
+#[cfg(feature = "unstable")]
+pub mod io;
+
 use core::fmt;
 
 /// A non-blocking result
