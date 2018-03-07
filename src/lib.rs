@@ -397,6 +397,12 @@ impl<E> Error<E> {
     }
 }
 
+impl<E> From<E> for Error<E> {
+    fn from(error: E) -> Error<E> {
+        Error::Other(error)
+    }
+}
+
 /// Await operation (*won't work until the language gains support for
 /// generators*)
 ///
