@@ -386,6 +386,17 @@ where
     }
 }
 
+impl<E> Error<E> {
+    /// Maps an `Error<E>` to `Error<T>` by applying a function to a contained
+    /// `Error::Other` value, leaving an `Error::WouldBlock` value untouched.
+    pub fn map<T, F>(self, op: F) -> Error<T> where F: FnOnce(E) -> T {
+        match self {
+            Error::Other(e) => Error::Other(op(e)),
+            Error::WouldBlock => Error::WouldBlock,
+        }
+    }
+}
+
 /// Await operation (*won't work until the language gains support for
 /// generators*)
 ///
