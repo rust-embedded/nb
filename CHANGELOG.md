@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.2] - 2019-04-21
+
+### Added
+
+- `Error<E>` gained a `map` method that lets you transform the error in the
+  `Error::Other` variant into a different type.
+
+- `Error<E>` now implements the `From<E>` trait.
+
 ## [v0.1.1] - 2018-01-10
 
 ### Fixed
@@ -17,5 +26,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/nb/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/japaric/nb/compare/v0.1.2...HEAD
+[v0.1.2]: https://github.com/japaric/nb/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/japaric/nb/compare/v0.1.0...v0.1.1

@@ -6,7 +6,7 @@ keywords = ["await", "futures", "IO"]
 license = "MIT OR Apache-2.0"
 name = "nb"
 repository = "https://github.com/japaric/nb"
-version = "0.1.1"
+version = "0.1.2"
 
 [features]
 unstable = []
