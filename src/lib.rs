@@ -488,7 +488,7 @@ macro_rules! block {
 /// # Output
 ///
 /// - `Ok(t)` if `$e` evaluates to `Ok(t)`
-/// - `Err(e)` if `$e` evaluates to `Err(nb::Error::Other(e))`
+/// - `Err(nb::Error::Other(e))` if `$e` evaluates to `Err(nb::Error::Other(e))`
 /// - `Err(Error::WouldBlock)` if `$e` evaluates to `Err(Error::WouldBlock)` and `$c` evaluates to false
 #[macro_export]
 macro_rules! block_while {
@@ -498,7 +498,7 @@ macro_rules! block_while {
             match $e {
                 Err($crate::Error::Other(e)) => {
                     #[allow(unreachable_code)]
-                    break Err(e)
+                    break Err($crate::Error::Other(e))
                 },
                 Err($crate::Error::WouldBlock) => {
                     if !$c {
