@@ -298,8 +298,9 @@
 //! #[macro_use(await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
-//! use std::pin::Pin;
+//! extern crate core;
+//! use core::ops::Generator;
+//! use core::pin::Pin;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
