@@ -298,7 +298,9 @@
 //! #[macro_use(await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
+//! extern crate core;
+//! use core::ops::Generator;
+//! use core::pin::Pin;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
@@ -327,10 +329,12 @@
 //!         }
 //!     };
 //!
+//!     let blinky = Pin::new(&mut blinky);
+//!     let loopback = Pin::new(&mut loopback);
 //!     // Event loop
 //!     loop {
-//!         blinky.resume();
-//!         loopback.resume();
+//!         blinky.resume(());
+//!         loopback.resume(());
 //!         # break
 //!     }
 //! }
