@@ -393,7 +393,10 @@ where
 impl<E> Error<E> {
     /// Maps an `Error<E>` to `Error<T>` by applying a function to a contained
     /// `Error::Other` value, leaving an `Error::WouldBlock` value untouched.
-    pub fn map<T, F>(self, op: F) -> Error<T> where F: FnOnce(E) -> T {
+    pub fn map<T, F>(self, op: F) -> Error<T>
+    where
+        F: FnOnce(E) -> T,
+    {
         match self {
             Error::Other(e) => Error::Other(op(e)),
             Error::WouldBlock => Error::WouldBlock,
@@ -433,17 +436,18 @@ macro_rules! await {
         loop {
             #[allow(unreachable_patterns)]
             match $e {
-                Err($crate::Error::Other(e)) => {
+                Err($crate::Error::Other(e)) =>
+                {
                     #[allow(unreachable_code)]
                     break Err(e)
-                },
-                Err($crate::Error::WouldBlock) => {}, // yield (see below)
+                }
+                Err($crate::Error::WouldBlock) => {} // yield (see below)
                 Ok(x) => break Ok(x),
             }
 
             yield
         }
-    }
+    };
 }
 
 /// Turns the non-blocking expression `$e` into a blocking operation.
@@ -465,15 +469,16 @@ macro_rules! block {
         loop {
             #[allow(unreachable_patterns)]
             match $e {
-                Err($crate::Error::Other(e)) => {
+                Err($crate::Error::Other(e)) =>
+                {
                     #[allow(unreachable_code)]
                     break Err(e)
-                },
-                Err($crate::Error::WouldBlock) => {},
+                }
+                Err($crate::Error::WouldBlock) => {}
                 Ok(x) => break Ok(x),
             }
         }
-    }
+    };
 }
 
 /// Future adapter
@@ -507,10 +512,8 @@ macro_rules! try_nb {
     ($e:expr) => {
         match $e {
             Err($crate::Error::Other(e)) => return Err(e),
-            Err($crate::Error::WouldBlock) => {
-                return Ok(::futures::Async::NotReady)
-            },
+            Err($crate::Error::WouldBlock) => return Ok(::futures::Async::NotReady),
             Ok(x) => x,
         }
-    }
+    };
 }
