@@ -13,3 +13,6 @@ unstable = []
 
 [dev-dependencies]
 futures = "0.1.17"
+
+[build-dependencies]
+version_check = "0.9"

@@ -74,8 +74,10 @@
 //! [`block!`], [`try_nb!`] and [`await!`] macros to adapt it for blocking
 //! operation, or for non-blocking operation with `futures` or `await`.
 //!
-//! **NOTE** Currently, both `try_nb!` and `await!` are feature gated behind the `unstable` Cargo
+//! **NOTE**: Currently, both `try_nb!` and `await!` are feature gated behind the `unstable` Cargo
 //! feature.
+//!
+//! **NOTE2**: The `await!` macro is only available when compiling on nightly Rust.
 //!
 //! [`block!`]: macro.block.html
 //! [`try_nb!`]: macro.try_nb.html
@@ -429,7 +431,7 @@ impl<E> From<E> for Error<E> {
 ///
 /// - `Ok(t)` if `$e` evaluates to `Ok(t)`
 /// - `Err(e)` if `$e` evaluates to `Err(nb::Error::Other(e))`
-#[cfg(feature = "unstable")]
+#[cfg(nightly)]
 #[macro_export]
 macro_rules! await {
     ($e:expr) => {
