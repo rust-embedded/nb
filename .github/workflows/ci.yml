@@ -39,7 +39,7 @@ jobs:
           command: check
           args: --target=${{ matrix.TARGET }} --features unstable
       - uses: actions-rs/cargo@v1
-        if: ${{ matrix.TARGET == 'nightly' }}
+        if: ${{ matrix.rust == 'nightly' }}
         with:
           command: test
           args: --target=${{ matrix.TARGET }} --features unstable
