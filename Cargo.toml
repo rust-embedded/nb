@@ -5,7 +5,7 @@ description = "Minimal non-blocking I/O layer"
 keywords = ["await", "futures", "IO"]
 license = "MIT OR Apache-2.0"
 name = "nb"
-repository = "https://github.com/japaric/nb"
+repository = "https://github.com/rust-embedded/nb"
 version = "0.1.1"
 
 [features]
