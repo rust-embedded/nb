@@ -144,21 +144,24 @@
 //! Turn on an LED for one second and *then* loops back serial data.
 //!
 //! ```
+//! use core::convert::Infallible;
 //! use nb::block;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
+//! # fn main() -> Result<(), Infallible> {
 //! // Turn the LED on for one second
 //! Led.on();
-//! block!(Timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
+//! block!(Timer.wait())?;
 //! Led.off();
 //!
 //! // Serial interface loopback
-//! # return;
+//! # return Ok(());
 //! loop {
-//!     let byte = block!(Serial.read()).unwrap();
-//!     block!(Serial.write(byte)).unwrap();
+//!     let byte = block!(Serial.read())?;
+//!     block!(Serial.write(byte))?;
 //! }
+//! # }
 //!
 //! # mod hal {
 //! #   use nb;
@@ -170,8 +173,8 @@
 //! #   }
 //! #   pub struct Serial;
 //! #   impl Serial {
-//! #       pub fn read(&self) -> nb::Result<u8, ()> { Ok(0) }
-//! #       pub fn write(&self, _: u8) -> nb::Result<(), ()> { Ok(()) }
+//! #       pub fn read(&self) -> nb::Result<u8, Infallible> { Ok(0) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), Infallible> { Ok(()) }
 //! #   }
 //! #   pub struct Timer;
 //! #   impl Timer {
