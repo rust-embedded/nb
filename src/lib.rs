@@ -355,7 +355,6 @@
 //! ```
 
 #![no_std]
-#![deny(warnings)]
 
 use core::fmt;
 
