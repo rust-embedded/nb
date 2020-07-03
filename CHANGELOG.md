@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0]
+
+### Changed
+
+- [breaking-change] The `unstable` feature and its code has been removed.
+  This includes the macros `try_nb!` and `await!`.
+
 ## [v0.1.1] - 2018-01-10
 
 ### Fixed

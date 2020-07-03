@@ -4,6 +4,10 @@ on:
   pull_request:
 
 name: Clippy check
+
+env:
+  RUSTFLAGS: '-D warnings'
+
 jobs:
   clippy_check:
     runs-on: ubuntu-latest
