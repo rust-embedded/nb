@@ -61,7 +61,6 @@
 //! errors but may block:
 //!
 //! ```
-//! # extern crate core;
 //! use core::convert::Infallible;
 //!
 //! // This returns `Ok(())` or `Err(nb::Error::WouldBlock)`
@@ -88,10 +87,9 @@
 //! as global singletons and that no preemption is possible (i.e. interrupts are disabled).*
 //!
 //! ```
-//! # extern crate core;
 //! # use core::convert::Infallible;
 //! // This is the `hal` crate
-//! extern crate nb;
+//! use nb;
 //!
 //! /// An LED
 //! pub struct Led;
@@ -146,30 +144,25 @@
 //! Turn on an LED for one second and *then* loops back serial data.
 //!
 //! ```
-//! # extern crate core;
-//! # use core::convert::Infallible;
-//! #[macro_use(block)]
-//! extern crate nb;
+//! use nb::block;
 //!
 //! use hal::{Led, Serial, Timer};
 //!
-//! fn main() {
-//!     // Turn the LED on for one second
-//!     Led.on();
-//!     block!(Timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
-//!     Led.off();
+//! // Turn the LED on for one second
+//! Led.on();
+//! block!(Timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
+//! Led.off();
 //!
-//!     // Serial interface loopback
-//!     # return;
-//!     loop {
-//!         let byte = block!(Serial.read()).unwrap();
-//!         block!(Serial.write(byte)).unwrap();
-//!     }
+//! // Serial interface loopback
+//! # return;
+//! loop {
+//!     let byte = block!(Serial.read()).unwrap();
+//!     block!(Serial.write(byte)).unwrap();
 //! }
 //!
 //! # mod hal {
 //! #   use nb;
-//! #   use Infallible;
+//! #   use core::convert::Infallible;
 //! #   pub struct Led;
 //! #   impl Led {
 //! #       pub fn off(&self) {}
