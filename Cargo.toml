@@ -19,3 +19,8 @@ nb = "1"
 
 [dev-dependencies]
 futures = "0.1.17"
+
+[lib]
+# Due to the semver-trick, doctests do not compile:
+# error[E0465]: multiple rlib candidates for `nb` found
+doctest = false
