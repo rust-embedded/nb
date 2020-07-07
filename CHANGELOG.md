@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0] - 2020-07-07
+
 ### Changed
 
 - [breaking-change] The `unstable` feature and its code has been removed.
@@ -31,6 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/nb/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/rust-embedded/nb/compare/v1.0.0...HEAD
+[v1.0.0]: https://github.com/rust-embedded/nb/compare/v0.1.2...v1.0.0
 [v0.1.2]: https://github.com/rust-embedded/nb/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/rust-embedded/nb/compare/v0.1.0...v0.1.1
