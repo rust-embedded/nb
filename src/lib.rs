@@ -184,6 +184,7 @@
 //! ```
 
 #![no_std]
+#![doc(html_root_url = "https://docs.rs/nb/1.0.0")]
 
 use core::fmt;
 
