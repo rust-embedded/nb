@@ -386,20 +386,19 @@ macro_rules! await {
         loop {
             #[allow(unreachable_patterns)]
             match $e {
-                Err($crate::Error::Other(e)) => {
+                Err($crate::Error::Other(e)) =>
+                {
                     #[allow(unreachable_code)]
                     break Err(e)
-                },
-                Err($crate::Error::WouldBlock) => {}, // yield (see below)
+                }
+                Err($crate::Error::WouldBlock) => {} // yield (see below)
                 Ok(x) => break Ok(x),
             }
 
             yield
         }
-    }
+    };
 }
-
-
 
 /// Future adapter
 ///
@@ -432,10 +431,8 @@ macro_rules! try_nb {
     ($e:expr) => {
         match $e {
             Err($crate::Error::Other(e)) => return Err(e),
-            Err($crate::Error::WouldBlock) => {
-                return Ok(::futures::Async::NotReady)
-            },
+            Err($crate::Error::WouldBlock) => return Ok(::futures::Async::NotReady),
             Ok(x) => x,
         }
-    }
+    };
 }
