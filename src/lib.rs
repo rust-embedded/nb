@@ -263,7 +263,7 @@ macro_rules! block {
                 Ok(x) => break Ok(x),
             }
         }
-    }
+    };
 }
 
 /// Turns the non-blocking expression `$e` into a blocking operation for as long
@@ -302,5 +302,5 @@ macro_rules! block_while {
                 Ok(x) => break Ok(x),
             }
         }
-    }
+    };
 }
