@@ -290,15 +290,16 @@ macro_rules! block_while {
         loop {
             #[allow(unreachable_patterns)]
             match $e {
-                Err($crate::Error::Other(e)) => {
+                Err($crate::Error::Other(e)) =>
+                {
                     #[allow(unreachable_code)]
                     break Err($crate::Error::Other(e))
-                },
+                }
                 Err($crate::Error::WouldBlock) => {
                     if !$c {
                         break Err($crate::Error::WouldBlock);
                     }
-                },
+                }
                 Ok(x) => break Ok(x),
             }
         }
