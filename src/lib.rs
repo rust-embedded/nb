@@ -190,7 +190,6 @@ use core::fmt;
 use core::future::Future;
 use core::pin::Pin;
 use core::task::{Context, Poll};
-use pin_project_lite::pin_project;
 
 /// A non-blocking result
 pub type Result<T, E> = ::core::result::Result<T, Error<E>>;
@@ -269,10 +268,9 @@ macro_rules! block {
         }
     };
 }
-pin_project! {
-    pub struct NbFuture<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> {
-        gen: Gen,
-    }
+
+pub struct NbFuture<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> {
+    gen: Gen,
 }
 
 impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> From<Gen> for NbFuture<Ok, Err, Gen> {
@@ -285,8 +283,8 @@ impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> Future for NbFuture<Ok, Err, Gen>
     type Output = core::result::Result<Ok, Err>;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let this = self.project();
-        let res = (this.gen)();
+        let gen = unsafe { &mut self.get_unchecked_mut().gen };
+        let res = gen();
 
         match res {
             Ok(res) => Poll::Ready(Ok(res)),
