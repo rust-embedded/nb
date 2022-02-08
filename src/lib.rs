@@ -187,6 +187,10 @@
 #![doc(html_root_url = "https://docs.rs/nb/1.0.0")]
 
 use core::fmt;
+use core::future::Future;
+use core::pin::Pin;
+use core::task::{Context, Poll};
+use pin_project_lite::pin_project;
 
 /// A non-blocking result
 pub type Result<T, E> = ::core::result::Result<T, Error<E>>;
@@ -264,4 +268,48 @@ macro_rules! block {
             }
         }
     };
+}
+pin_project! {
+    pub struct NbFuture<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> {
+        gen: Gen,
+    }
+}
+
+impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> From<Gen> for NbFuture<Ok, Err, Gen> {
+    fn from(gen: Gen) -> Self {
+        Self { gen }
+    }
+}
+
+impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> Future for NbFuture<Ok, Err, Gen> {
+    type Output = core::result::Result<Ok, Err>;
+
+    fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
+        let this = self.project();
+        let res = (this.gen)();
+
+        match res {
+            Ok(res) => Poll::Ready(Ok(res)),
+            Err(Error::WouldBlock) => Poll::Pending,
+            Err(Error::Other(err)) => Poll::Ready(Err(err)),
+        }
+    }
+}
+
+/// The equivalent of [block], expect instead of blocking this creates a
+/// [Future] which can `.await`ed.
+///
+/// # Input
+///
+/// An expression `$e` that evaluates to `nb::Result<T, E>`
+///
+/// # Output
+///
+/// - `Ok(t)` if `$e` evaluates to `Ok(t)`
+/// - `Err(e)` if `$e` evaluates to `Err(nb::Error::Other(e))`
+#[macro_export]
+macro_rules! fut {
+    ($call:expr) => {{
+        nb::NbFuture::from(|| $call)
+    }};
 }
