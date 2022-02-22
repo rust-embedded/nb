@@ -71,9 +71,11 @@
 //! ```
 //!
 //! Once your API uses [`nb::Result`] you can leverage the [`block!`], macro
-//! to adapt it for blocking operation, or handle scheduling yourself.
+//! to adapt it for blocking operation, or handle scheduling yourself. You can
+//! also use the [`fut!`] macro to use it in an async/await context
 //!
 //! [`block!`]: macro.block.html
+//! [`fut!`]: macro.fut.html
 //! [`nb::Result`]: type.Result.html
 //!
 //! # Examples
@@ -182,6 +184,44 @@
 //! #   }
 //! # }
 //! ```
+//! ## Future mode
+//!
+//! Turn on an LED for one second and *then* loops back serial data.
+//!
+//! ```
+//! use core::convert::Infallible;
+//! use nb::fut;
+//!
+//! use hal::{Led, Serial, Timer};
+//!
+//! # async fn run() -> Result<(), Infallible>{
+//! Led.on();
+//! fut!(Timer.wait()).await;
+//! Led.off();
+//! loop {
+//!     let byte = fut!(Serial.read()).await?;
+//!     fut!(Serial.write(byte)).await?;
+//! }
+//! # }
+//!
+//! # mod hal {
+//! #   use nb;
+//! #   use core::convert::Infallible;
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&self) {}
+//! #       pub fn on(&self) {}
+//! #   }
+//! #   pub struct Serial;
+//! #   impl Serial {
+//! #       pub fn read(&self) -> nb::Result<u8, Infallible> { Ok(0) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), Infallible> { Ok(()) }
+//! #   }
+//! #   pub struct Timer;
+//! #   impl Timer {
+//! #       pub fn wait(&self) -> nb::Result<(), Infallible> { Ok(()) }
+//! #   }
+//! # }
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/nb/1.0.0")]
