@@ -203,6 +203,19 @@ pub enum Error<E> {
     WouldBlock,
 }
 
+#[cfg(feature="defmt")]
+impl<E> defmt::Format for Error<E>
+where
+    E: defmt::Format,
+{
+    fn format(&self, f: defmt::Formatter) {
+        match *self {
+            Error::Other(ref e) => defmt::Format::format(e, f),
+            Error::WouldBlock => defmt::write!(f, "WouldBlock",),
+        }
+    }
+}
+
 impl<E> fmt::Debug for Error<E>
 where
     E: fmt::Debug,

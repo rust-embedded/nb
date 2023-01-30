@@ -11,3 +11,6 @@ documentation = "https://docs.rs/nb"
 readme = "README.md"
 version = "1.0.0" # remember to update html_root_url
 edition = "2018"
+
+[dependencies]
+defmt = {version = "0.3", optional = true}
