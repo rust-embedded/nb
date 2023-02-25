@@ -12,5 +12,8 @@ readme = "README.md"
 version = "1.0.0" # remember to update html_root_url
 edition = "2018"
 
+[features]
+"defmt-0.3" = ["defmt"]
+
 [dependencies]
 defmt = {version = "0.3", optional = true}

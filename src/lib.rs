@@ -203,7 +203,7 @@ pub enum Error<E> {
     WouldBlock,
 }
 
-#[cfg(feature="defmt")]
+#[cfg(feature = "defmt-0.3")]
 impl<E> defmt::Format for Error<E>
 where
     E: defmt::Format,
