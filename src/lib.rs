@@ -182,6 +182,10 @@
 //! #   }
 //! # }
 //! ```
+//!
+//! # Features
+//!
+//! - `defmt-0.3` - unstable feature which adds [`defmt::Format`] impl for [`Error`].
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/nb/1.0.0")]
@@ -201,6 +205,19 @@ pub enum Error<E> {
     Other(E),
     /// This operation requires blocking behavior to complete
     WouldBlock,
+}
+
+#[cfg(feature = "defmt-0.3")]
+impl<E> defmt::Format for Error<E>
+where
+    E: defmt::Format,
+{
+    fn format(&self, f: defmt::Formatter) {
+        match *self {
+            Error::Other(ref e) => defmt::Format::format(e, f),
+            Error::WouldBlock => defmt::write!(f, "WouldBlock",),
+        }
+    }
 }
 
 impl<E> fmt::Debug for Error<E>
