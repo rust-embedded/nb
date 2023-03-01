@@ -182,6 +182,10 @@
 //! #   }
 //! # }
 //! ```
+//!
+//! # Features
+//!
+//! - `defmt-0.3` - unstable feature which adds [`defmt::Format`] impl for [`Error`].
 
 #![no_std]
 #![doc(html_root_url = "https://docs.rs/nb/1.0.0")]
