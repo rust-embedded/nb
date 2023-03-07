@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.1.0] - 2023-03-07
+
 ### Added
 
 - Add `defmt` as optional dependency and implement `defmt::Format` for `Error<E: defmt::Format>`, enabled by `defmt-0.3` unstable feature.
@@ -37,7 +39,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/nb/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/rust-embedded/nb/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/rust-embedded/nb/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/rust-embedded/nb/compare/v0.1.2...v1.0.0
 [v0.1.2]: https://github.com/rust-embedded/nb/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/rust-embedded/nb/compare/v0.1.0...v0.1.1
