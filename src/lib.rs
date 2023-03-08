@@ -185,7 +185,7 @@
 //!
 //! # Features
 //!
-//! - `defmt-0.3` - unstable feature which adds [`defmt::Format`] impl for [`Error`].
+//! - `defmt-0-3` - unstable feature which adds [`defmt::Format`] impl for [`Error`].
 
 #![no_std]
 
@@ -206,7 +206,7 @@ pub enum Error<E> {
     WouldBlock,
 }
 
-#[cfg(feature = "defmt-0.3")]
+#[cfg(feature = "defmt-0-3")]
 impl<E> defmt::Format for Error<E>
 where
     E: defmt::Format,

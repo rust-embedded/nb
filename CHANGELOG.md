@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Add `defmt` as optional dependency and implement `defmt::Format` for `Error<E: defmt::Format>`, enabled by `defmt-0.3` unstable feature.
+- Add `defmt` as optional dependency and implement `defmt::Format` for `Error<E: defmt::Format>`, enabled by `defmt-0-3` unstable feature.
 
 ## [v1.0.0] - 2020-07-07
 
