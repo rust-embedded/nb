@@ -1,32 +1,4 @@
-//! Minimal and reusable non-blocking I/O layer
-//!
-//! The ultimate goal of this crate is *code reuse*. With this crate you can
-//! write *core* I/O APIs that can then be adapted to operate in either blocking
-//! or non-blocking manner. Furthermore those APIs are not tied to a particular
-//! asynchronous model and can be adapted to work with the `futures` model or
-//! with the `async` / `await` model.
-//!
-//! # Core idea
-//!
-//! The [`WouldBlock`](enum.Error.html) error variant signals that the operation
-//! can't be completed *right now* and would need to block to complete.
-//! [`WouldBlock`](enum.Error.html) is a special error in the sense that's not
-//! *fatal*; the operation can still be completed by retrying again later.
-//!
-//! [`nb::Result`](type.Result.html) is based on the API of
-//! [`std::io::Result`](https://doc.rust-lang.org/std/io/type.Result.html),
-//! which has a `WouldBlock` variant in its
-//! [`ErrorKind`](https://doc.rust-lang.org/std/io/enum.ErrorKind.html).
-//!
-//! We can map [`WouldBlock`](enum.Error.html) to different blocking and
-//! non-blocking models:
-//!
-//! - In blocking mode: [`WouldBlock`](enum.Error.html) means try again right
-//!   now (i.e. busy wait)
-//! - In `futures` mode: [`WouldBlock`](enum.Error.html) means
-//!   [`Async::NotReady`](https://docs.rs/futures)
-//! - In `await` mode: [`WouldBlock`](enum.Error.html) means `yield`
-//!   (suspend the generator)
+#![doc = include_str!("../README.md")]
 //!
 //! # How to use this crate
 //!
