@@ -1,7 +1,7 @@
 [![crates.io](https://img.shields.io/crates/d/nb.svg)](https://crates.io/crates/nb)
 [![crates.io](https://img.shields.io/crates/v/nb.svg)](https://crates.io/crates/nb)
 [![Documentation](https://docs.rs/nb/badge.svg)](https://docs.rs/nb)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.60+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.62+-blue.svg)
 
 # `nb`
 
@@ -42,7 +42,7 @@ non-blocking models:
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
+This crate is guaranteed to compile on stable Rust 1.62 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
 ## License
