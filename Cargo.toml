@@ -11,7 +11,7 @@ documentation = "https://docs.rs/nb"
 readme = "README.md"
 version = "1.1.0"
 edition = "2018"
-rust-version = "1.60"
+rust-version = "1.62"
 
 [features]
 "defmt-0-3" = ["dep:defmt"]
