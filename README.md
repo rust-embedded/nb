@@ -33,7 +33,7 @@ We can map [`WouldBlock`](enum.Error.html) to different blocking and
 non-blocking models:
 
 - In blocking mode, [`WouldBlock`](enum.Error.html) means try again right
-  now (i.e. busy wait).
+  now, i.e. busy waiting.
 - In `async` mode, [`WouldBlock`](enum.Error.html) means
   [`Poll::Pending`](https://doc.rust-lang.org/core/task/enum.Poll.html#variant.Pending).
 
