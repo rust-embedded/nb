@@ -21,7 +21,7 @@ with the `async` / `await` model.
 
 The [`WouldBlock`](enum.Error.html) error variant signals that the operation
 can't be completed *right now* and would need to block to complete.
-[`WouldBlock`](enum.Error.html) is a special error in the sense that's not
+[`WouldBlock`](enum.Error.html) is a special error in the sense that it's not
 *fatal*; the operation can still be completed by retrying again later.
 
 [`nb::Result`](type.Result.html) is based on the API of
@@ -32,12 +32,10 @@ which has a `WouldBlock` variant in its
 We can map [`WouldBlock`](enum.Error.html) to different blocking and
 non-blocking models:
 
-- In blocking mode: [`WouldBlock`](enum.Error.html) means try again right
-  now (i.e. busy wait)
-- In `futures` mode: [`WouldBlock`](enum.Error.html) means
-  [`Async::NotReady`](https://docs.rs/futures)
-- In `await` mode: [`WouldBlock`](enum.Error.html) means `yield`
-  (suspend the generator)
+- In blocking mode, [`WouldBlock`](enum.Error.html) means try again right
+  now, i.e. busy waiting.
+- In `async` mode, [`WouldBlock`](enum.Error.html) means
+  [`Poll::Pending`](https://doc.rust-lang.org/core/task/enum.Poll.html#variant.Pending).
 
 
 ## Minimum Supported Rust Version (MSRV)
