@@ -43,9 +43,11 @@
 //! ```
 //!
 //! Once your API uses [`nb::Result`] you can leverage the [`block!`], macro
-//! to adapt it for blocking operation, or handle scheduling yourself.
+//! to adapt it for blocking operation, or handle scheduling yourself. You can
+//! also use the [`fut!`] macro to use it in an async/await context
 //!
 //! [`block!`]: macro.block.html
+//! [`fut!`]: macro.fut.html
 //! [`nb::Result`]: type.Result.html
 //!
 //! # Examples
@@ -154,6 +156,44 @@
 //! #   }
 //! # }
 //! ```
+//! ## Future mode
+//!
+//! Turn on an LED for one second and *then* loops back serial data.
+//!
+//! ```
+//! use core::convert::Infallible;
+//! use nb::fut;
+//!
+//! use hal::{Led, Serial, Timer};
+//!
+//! # async fn run() -> Result<(), Infallible>{
+//! Led.on();
+//! fut!(Timer.wait()).await;
+//! Led.off();
+//! loop {
+//!     let byte = fut!(Serial.read()).await?;
+//!     fut!(Serial.write(byte)).await?;
+//! }
+//! # }
+//!
+//! # mod hal {
+//! #   use nb;
+//! #   use core::convert::Infallible;
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&self) {}
+//! #       pub fn on(&self) {}
+//! #   }
+//! #   pub struct Serial;
+//! #   impl Serial {
+//! #       pub fn read(&self) -> nb::Result<u8, Infallible> { Ok(0) }
+//! #       pub fn write(&self, _: u8) -> nb::Result<(), Infallible> { Ok(()) }
+//! #   }
+//! #   pub struct Timer;
+//! #   impl Timer {
+//! #       pub fn wait(&self) -> nb::Result<(), Infallible> { Ok(()) }
+//! #   }
+//! # }
 //!
 //! # Features
 //!
@@ -162,6 +202,9 @@
 #![no_std]
 
 use core::fmt;
+use core::future::Future;
+use core::pin::Pin;
+use core::task::{Context, Poll};
 
 /// A non-blocking result
 pub type Result<T, E> = ::core::result::Result<T, Error<E>>;
@@ -252,4 +295,47 @@ macro_rules! block {
             }
         }
     };
+}
+
+pub struct NbFuture<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> {
+    gen: Gen,
+}
+
+impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> From<Gen> for NbFuture<Ok, Err, Gen> {
+    fn from(gen: Gen) -> Self {
+        Self { gen }
+    }
+}
+
+impl<Ok, Err, Gen: FnMut() -> Result<Ok, Err>> Future for NbFuture<Ok, Err, Gen> {
+    type Output = core::result::Result<Ok, Err>;
+
+    fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
+        let gen = unsafe { &mut self.get_unchecked_mut().gen };
+        let res = gen();
+
+        match res {
+            Ok(res) => Poll::Ready(Ok(res)),
+            Err(Error::WouldBlock) => Poll::Pending,
+            Err(Error::Other(err)) => Poll::Ready(Err(err)),
+        }
+    }
+}
+
+/// The equivalent of [block], expect instead of blocking this creates a
+/// [Future] which can `.await`ed.
+///
+/// # Input
+///
+/// An expression `$e` that evaluates to `nb::Result<T, E>`
+///
+/// # Output
+///
+/// - `Ok(t)` if `$e` evaluates to `Ok(t)`
+/// - `Err(e)` if `$e` evaluates to `Err(nb::Error::Other(e))`
+#[macro_export]
+macro_rules! fut {
+    ($call:expr) => {{
+        nb::NbFuture::from(|| $call)
+    }};
 }
