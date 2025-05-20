@@ -185,7 +185,7 @@ where
 {
     fn format(&self, f: defmt::Formatter) {
         match *self {
-            Error::Other(ref e) => defmt::Format::format(e, f),
+            Error::Other(ref e) => defmt::write!(f, "{}", e),
             Error::WouldBlock => defmt::write!(f, "WouldBlock",),
         }
     }

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Raised MSRV to 1.84.0
 - Set `resolver = "3"`, which implies `resolver.incompatible-rust-versions = "fallback"`
 
+### Fixed
+- Fix panic caused by defmt forwarding
+
 ## [v1.1.0] - 2023-03-07
 
 ### Added
